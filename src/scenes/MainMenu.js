@@ -2,9 +2,11 @@ import { Scene } from 'phaser';
 
 export class MainMenu extends Scene
 {
+    
     constructor ()
     {
         super('MainMenu');
+        this.cards = []
     }
 
     create ()
@@ -13,7 +15,7 @@ export class MainMenu extends Scene
 
         this.add.image(512, 300, 'logo');
 
-        this.add.text(512, 460, 'Main Menu', {
+        this.add.text(512, 460, 'Hello Menu', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
@@ -24,5 +26,9 @@ export class MainMenu extends Scene
             this.scene.start('Game');
 
         });
+    }
+
+    update() {
+        
     }
 }
