@@ -1,3 +1,5 @@
+// @ts-check
+
 import { GameObjects, Scene } from "phaser";
 import { Card, COLORS } from "./Card";
 import UnoCard from "./UnoCard.js"
@@ -111,12 +113,12 @@ export class Game extends Scene {
     this.deck = new Deck(this, 600, 300)
 
     const card = new UnoCard(this, 200, 200, "2", COLORS.BLUE);
-    const flippedCard = new UnoCard(this, 300, 200, null, null);
+    // const flippedCard = new UnoCard(this, 300, 200, null, null);
     card.setRotation(1.4)
-    // flippedCard.setRotation(0.4)
+    // // flippedCard.setRotation(0.4)
 
-    card.setX(500)
-    card.setY(500)
+    // card.setX(500)
+    // card.setY(500)
     this.player = new Player(this);
     this.player.x = 100;
     this.input.on("pointerdown", this.pointerDownHandler, this);
@@ -125,12 +127,15 @@ export class Game extends Scene {
 
     this.add.line(0, 0, 0, 100, CONFIG.SCREEN_WIDTH, 100, 0x000000).setOrigin(0)
     this.add.line(0, 0, 0, 200, CONFIG.SCREEN_WIDTH, 200, 0xff0000).setOrigin(0)
+
+    this.add.line(0, 0, 0, 400, CONFIG.SCREEN_WIDTH, 400, 0xff0000).setOrigin(0)
+    this.add.line(0, 0, 800, 0, 800, CONFIG.SCREEN_HEIGHT, 0x000000).setOrigin(0)
   }
 
   pointerDownHandler(pointer, targets) {
     if(targets[0]?.name==="deck") {
       console.log(targets)
-      this.deck.cards.shift()
+      this.deck.drawCards(1);
       return 
     }
 
