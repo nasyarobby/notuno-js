@@ -28,9 +28,10 @@ export default class Deck extends Phaser.GameObjects.Sprite {
         scene,
         this.x + randomFloat(-10, 10),
         this.y + randomFloat(-8, 12),
+        i,
         Math.round(randomFloat(0, 9)).toString(),
         Math.round(randomFloat(0, 3)),
-        // true
+        true
       );
       card.setRotation(randomFloat(-0.1, 0.1));
       card.setInteractive("deck");
@@ -50,24 +51,16 @@ export default class Deck extends Phaser.GameObjects.Sprite {
     this.cardsLeftlabel.setText(this.cards.length.toString());
   }
 
-  /**
-   *
-   * @param {number} n
-   */
-  drawCards(n) {
+  drawCards() {
     const card = this.cards.pop();
 
-    // card?.readd();
     if (this.lastDepth === undefined) this.lastDepth = 0;
     this.lastDepth++;
     if (card) {
-      card.base.depth = this.lastDepth;
-      card.suitBase.depth = this.lastDepth;
-      card.face.depth = this.lastDepth;
-      if(card.faceBg) card.faceBg.depth = this.lastDepth;
-      if(card.corner1) card.corner1.depth = this.lastDepth;
-      if(card.corner2) card.corner2.depth = this.lastDepth;
+      card.setDepth(this.lastDepth)
       card.flingTo(randomFloat(790, 820), randomFloat(380, 400));
+      card.flipped = false
     }
+    return card;
   }
 }
