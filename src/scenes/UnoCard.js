@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import RoundRectangle from "phaser3-rex-plugins/plugins/gameobjects/shape/roundrectangle/RoundRectangle";
+import EventDispatcher from "./EventDispatcher";
 
 export const COLORS = {
   RED: 0,
@@ -40,7 +41,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
   /** @type {{x: number, y: number}} */
   speed;
 
-  /** @type {{x: number, y: number}[]} */
+  /** @type {{x: number, y: number, speed: number, rotatingSpeed: number}[]} */
   destination;
 
   /**
@@ -173,13 +174,15 @@ export default class Card extends Phaser.GameObjects.Sprite {
     const destination = this.destination[0];
 
     if (destination) {
+      this.state = "moving"
+      this.rotatingSpeed = destination.rotatingSpeed;
       const directionRad = Phaser.Math.Angle.Between(
         this.x,
         this.y,
         destination.x,
         destination.y
       );
-      this.speed = Phaser.Math.Rotate({ x: 1, y: 0 }, directionRad);
+      this.speed = Phaser.Math.Rotate({ x: destination.speed, y: 0 }, directionRad);
 
       if (this.speed?.x) {
         this.setX(this.x + this.speed.x * delta);
@@ -223,17 +226,28 @@ export default class Card extends Phaser.GameObjects.Sprite {
         }
       }
     }
-    if ((this.speed.y === 0) & (this.speed.x === 0)) {
-      this.state = "idle";
-      console.log("Card " + this.id + " is now idle");
+    if (this.state ==="moving" && (this.speed.y === 0) & (this.speed.x === 0)) {
+      // console.log("Card " + this.id + " is now idle");
       this.destination.shift();
+      EventDispatcher.getE().emit("CARD_FINISHED_MOVING", {
+        id: this.id
+      })
+      this.state = "idle"
     }
   }
 
-  flingTo(x, y, state) {
-    this.destination.push({ x, y });
-
-    this.rotatingSpeed = 0.015;
-    this.state = state;
+  /**
+   * 
+   * @param {{x: number, y: number, speed?: number, rotatingSpeed?: number}} param0 
+   */
+  flingTo({
+    x,
+    y,
+    speed,
+    rotatingSpeed,
+  }) {
+    if(!rotatingSpeed) rotatingSpeed = 0;
+    if(!speed) speed = 2;
+    this.destination.push({ x, y, speed, rotatingSpeed});
   }
 }
