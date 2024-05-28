@@ -35,8 +35,8 @@ export default class Hand extends Phaser.GameObjects.Sprite {
     if (this.cards.findIndex((c) => c.id === card.id) === -1) {
       this.cards.push(card);
       console.log("Receive card " + card.id, card);
-    //   card.flingTo(this.x, this.y)
-    //   card.setRotation(-Math.PI/2)
+      card.flingTo(this.x, this.y)
+      // card.setRotation(-Math.PI/2)
     } else {
       throw new Error("Card already received.");
     }

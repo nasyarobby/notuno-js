@@ -33,7 +33,7 @@ export default class Deck extends Phaser.GameObjects.Sprite {
         Math.round(randomFloat(0, 3)),
         true
       );
-      card.setRotation(randomFloat(-0.1, 0.1));
+      card.setRotation(randomFloat(-0.5, 0.5));
       card.setInteractive("deck");
       this.cards.push(card);
     }

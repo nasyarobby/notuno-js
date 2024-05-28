@@ -1,8 +1,6 @@
 import { Scene } from "phaser";
 import RoundRectangle from "phaser3-rex-plugins/plugins/gameobjects/shape/roundrectangle/RoundRectangle";
 
-const CORNER_FACE_1_OFFSET_X = 45;
-
 export const COLORS = {
   RED: 0,
   GREEN: 1,
@@ -81,30 +79,15 @@ export default class Card extends Phaser.GameObjects.Sprite {
       .setOrigin(0.5)
       .setRotation(Math.PI / 4);
 
-    this.corner1 = scene.add
-      .text(this.x - CORNER_FACE_1_OFFSET_X, this.y - 60, value, {
-        color: "#000",
-        // strokeThickness: 1,
-        // stroke: "#000",
-      })
-      .setOrigin(0.5);
-    this.corner2 = scene.add
-      .text(this.x + CORNER_FACE_1_OFFSET_X, this.y + 60, value, {
-        color: "#000",
-        // strokeThickness: 1,
-        // stroke: "#000",
-      })
-      .setOrigin(0.5);
-    this.corner2.rotation = Math.PI;
+    this.faceCorner = scene.add.image(this.x, this.y, value).setOrigin(0.5).setTintFill(0xFFFFFF);
 
     this.face = scene.add
-      .text(this.x, this.y, value, {
-        fontSize: 64,
-        color: "#000",
-        strokeThickness: 3,
-        stroke: "#000",
-      })
-      .setOrigin(0.5);
+      .image(this.x, this.y, value)
+      .setOrigin(0.5)
+      .setCrop(30, 40, 50, 50);
+
+    this.face.setTintFill(color)
+
     this.backColor = scene.add
       .rexRoundRectangle(this.x, this.y, 115, 155, 10, 0x000000)
       .setOrigin(0.5);
@@ -121,13 +104,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
       })
       .setOrigin(0.5);
 
-    this.front = [
-      this.suitBase,
-      this.faceBg,
-      this.corner1,
-      this.corner2,
-      this.face,
-    ];
+    this.front = [this.suitBase, this.faceBg, this.faceCorner, this.face];
     this.back = [this.backColor, this.backEllipse, this.backText];
 
     scene.events.on("update", this.update, this);
@@ -145,17 +122,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
     this.base.x = x;
     this.back.forEach((node) => (node.x = x));
     this.front.forEach((node, index) => {
-      if (index === 2) {
-        const corner1NewXy = Phaser.Math.RotateAround(
-          { x: this.x - CORNER_FACE_1_OFFSET_X, y: this.y - 60 },
-          this.x,
-          this.y,
-          this.rotation
-        );
-        this.corner1.setX(corner1NewXy.x);
-        // this.corner1.setY(corner1NewXy.y);
-      } else if (index === 3) {
-      } else return (node.x = x);
+      return (node.x = x);
     });
   }
 
@@ -171,35 +138,10 @@ export default class Card extends Phaser.GameObjects.Sprite {
     this.base.setRotation(rad);
     this.suitBase.setRotation(rad);
 
-    if (this.face) {
-      this.face.setRotation(rad);
-    }
+    this.face.setRotation(rad);
+    this.faceCorner.setRotation(rad);
 
     if (this.faceBg) this.faceBg.setRotation(Math.PI / 4 + rad);
-
-    if (this.corner1) {
-      this.corner1.setRotation(rad);
-      const corner1NewXy = Phaser.Math.RotateAround(
-        { x: this.x - CORNER_FACE_1_OFFSET_X, y: this.y - 60 },
-        this.x,
-        this.y,
-        rad
-      );
-      this.corner1.setX(corner1NewXy.x);
-      this.corner1.setY(corner1NewXy.y);
-    }
-
-    if (this.corner2) {
-      const corner2NewXy = Phaser.Math.RotateAround(
-        { x: this.x + CORNER_FACE_1_OFFSET_X, y: this.y + 60 },
-        this.x,
-        this.y,
-        rad
-      );
-      this.corner2.setX(corner2NewXy.x);
-      this.corner2.setY(corner2NewXy.y);
-      this.corner2.rotation = Math.PI + rad;
-    }
 
     this.back.forEach((node, index) => {
       if (index === 1) node.setRotation(Math.PI / 4 + rad);
@@ -237,7 +179,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
         destination.x,
         destination.y
       );
-      this.speed = Phaser.Math.Rotate({ x: 2, y: 0 }, directionRad);
+      this.speed = Phaser.Math.Rotate({ x: 1, y: 0 }, directionRad);
 
       if (this.speed?.x) {
         this.setX(this.x + this.speed.x * delta);
@@ -291,7 +233,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
   flingTo(x, y, state) {
     this.destination.push({ x, y });
 
-    this.rotatingSpeed = 0.003;
+    this.rotatingSpeed = 0.015;
     this.state = state;
   }
 }
