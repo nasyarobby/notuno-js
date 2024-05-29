@@ -3,6 +3,7 @@ import { Scene } from "phaser";
 import Card, { COLORS } from "./UnoCard.js";
 import EventDispatcher from "./EventDispatcher.js";
 import { timer } from "./helpers.js";
+import { CONFIG } from "../config.js";
 
 function randomFloat(min, max) {
   // Ensure min <= max for valid range
@@ -59,55 +60,112 @@ export default class Deck extends Phaser.GameObjects.Sprite {
     if (this.lastDepth === undefined) this.lastDepth = 0;
     this.lastDepth++;
     if (card) {
-      card.setDepth(this.lastDepth)
-      card.flingTo({x: randomFloat(790, 820), y: randomFloat(380, 400)});
-      card.flipped = false
+      card.setDepth(this.lastDepth);
+      card.flingTo({ x: randomFloat(790, 820), y: randomFloat(380, 400) });
+      card.flipped = false;
     }
     return card;
   }
 
-  async shuffleanimation(n) {
-    if(n===0) {
+  /**
+   *
+   * @param {2|3|4} numOfPlayers
+   */
+  async animateDrawCards(numOfPlayers) {
+    const NUM_CARDS_EACH = 7;
+
+    let pos = [
+      {
+        x: CONFIG.SCREEN_WIDTH / 2,
+        y: 500,
+      },
+      {
+        x: CONFIG.SCREEN_WIDTH / 2,
+        y: 300,
+      },
+    ];
+    if (numOfPlayers === 3) {
+      pos[1] = {
+        x: (CONFIG.SCREEN_WIDTH / 2) -200,
+        y: 300
+      }
+
+      pos[2] = {
+        x: (CONFIG.SCREEN_WIDTH / 2) + 200,
+        y: 300
+      }
+    }
+
+    if (numOfPlayers === 4) {
+      pos[2] = {...pos[1]}
+      pos[3] = {...pos[1]}
+
+      pos[1].x -= 200; 
+      pos[3].x += 200; 
+
+    }
+
+    let i = 0;
+    this.cards.reduce(async (prev, card, index) => {
+      await prev;
+      if (index >= NUM_CARDS_EACH * numOfPlayers) return;
+        card.flingTo(pos[index % numOfPlayers]);
+      return new Promise((res) => {
+        EventDispatcher.getE().on("CARD_FINISHED_MOVING", (params) => {
+          console.log(params);
+          if (params.id === card.id) {
+            EventDispatcher.getE().off("CARD_FINISHED_MOVING");
+            res(null);
+          }
+        });
+      });
+    }, Promise.resolve(null));
+  }
+
+  async animateShuffling(n) {
+    if (n === 0) {
       EventDispatcher.getE().emit("SHUFFLING_ENDED");
       return;
-    };
+    }
 
-    const NUMBER_OF_CARDS = 20
+    const NUMBER_OF_CARDS = 20;
 
-    const cards = this.cards.slice(0, NUMBER_OF_CARDS).map(c => {
-      c.flingTo({x: this.x+100, y: this.y-250});
+    const cards = this.cards.slice(0, NUMBER_OF_CARDS).map((c) => {
+      c.flingTo({ x: this.x + 100, y: this.y - 250 });
       return c;
     });
 
-    await new Promise(res => {
+    await new Promise((res) => {
       EventDispatcher.getE().on("CARD_FINISHED_MOVING", (params) => {
-        if(params.id === cards[cards.length-1].id) {
+        if (params.id === cards[cards.length - 1].id) {
           EventDispatcher.getE().off("CARD_FINISHED_MOVING");
-          res(null)
+          res(null);
         }
-      })
-    })
+      });
+    });
 
-    this.cards = [...this.cards.slice(NUMBER_OF_CARDS)]
+    this.cards = [...this.cards.slice(NUMBER_OF_CARDS)];
     // console.log(this.cards.map(c =>c.id))
-    
-    await cards.reduce(async (p,c) => {
+
+    await cards.reduce(async (p, c) => {
       await p;
       this.cards.push(c);
-      return new Promise(res => setTimeout(() => {
-        c.flingTo({x:this.x, y: this.y});
-        this.lastDepth++;
-        c.setDepth(this.lastDepth)
-        return res(null);
-      }, 10))
-    }, Promise.resolve(null))
+      return new Promise((res) =>
+        setTimeout(() => {
+          c.flingTo({ x: this.x, y: this.y });
+          this.lastDepth++;
+          c.setDepth(this.lastDepth);
+          return res(null);
+        }, 10)
+      );
+    }, Promise.resolve(null));
 
     EventDispatcher.getE().on("CARD_FINISHED_MOVING", async (params) => {
-      if(params.id === cards[cards.length-1].id) {
+      if (params.id === cards[cards.length - 1].id) {
         EventDispatcher.getE().off("CARD_FINISHED_MOVING");
         await timer(300);
-        this.shuffleanimation(n-1);
+        this.animateShuffling(n - 1);
       }
-    })
+    });
   }
 }

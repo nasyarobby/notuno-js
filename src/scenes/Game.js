@@ -17,8 +17,11 @@ import EventDispatcher from "./EventDispatcher.js";
 export class Game extends Scene {
   /** @type {Deck} */
   deck;
+  e;
   constructor() {
     super("Game");
+    this.e = EventDispatcher.getE();
+    this.e.on("GAME_START", this.onGameStart.bind(this));
   }
 
   create() {
@@ -43,9 +46,23 @@ export class Game extends Scene {
       this.add.line(0, 0, i, 0, i, CONFIG.SCREEN_HEIGHT, 0x000).setOrigin(0);
     }
 
-    this.deck.shuffleanimation(4);
 
-    EventDispatcher.getE().on("SHUFFLING_ENDED", () => console.log("Finished shuffling"))
+    this.start();
+  }
+
+  start() {
+    this.e.emit("GAME_START", {game: "start"})
+    EventDispatcher.getE().on("SHUFFLING_ENDED", this.onFinishedShuffling.bind(this))
+  }
+
+  onGameStart(params) {
+    console.log(params)
+    this.deck.animateShuffling(3);
+
+  }
+
+  onFinishedShuffling(params) {
+    this.deck.animateDrawCards(4)
   }
 
   update() {}
