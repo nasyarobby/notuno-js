@@ -115,7 +115,7 @@ export default class Card extends Phaser.GameObjects.Sprite {
 
   setInteractive(name) {
     this.base.setInteractive();
-    this.base.name = name;
+    this.base.playerName = name;
   }
 
   setX(x) {

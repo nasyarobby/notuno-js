@@ -2,17 +2,8 @@
 import { Scene } from "phaser";
 import Card, { COLORS } from "./UnoCard.js";
 import EventDispatcher from "./EventDispatcher.js";
-import { timer } from "./helpers.js";
+import { timer, getRandomFloat } from "./helpers.js";
 import { CONFIG } from "../config.js";
-
-function randomFloat(min, max) {
-  // Ensure min <= max for valid range
-  if (min > max) {
-    [min, max] = [max, min]; // Swap values if min is greater than max
-  }
-
-  return min + (max - min) * Math.random();
-}
 
 export default class Deck extends Phaser.GameObjects.Sprite {
   /** @type {Card[]} */
@@ -29,14 +20,14 @@ export default class Deck extends Phaser.GameObjects.Sprite {
     for (let i = 120; i > 0; i--) {
       const card = new Card(
         scene,
-        this.x + randomFloat(-10, 10),
-        this.y + randomFloat(-8, 12),
+        this.x + getRandomFloat(-10, 10),
+        this.y + getRandomFloat(-8, 12),
         i,
-        Math.round(randomFloat(0, 9)).toString(),
-        Math.round(randomFloat(0, 3)),
+        Math.round(getRandomFloat(0, 9)).toString(),
+        Math.round(getRandomFloat(0, 3)),
         true
       );
-      card.setRotation(randomFloat(-0.2, 0.2));
+      card.setRotation(getRandomFloat(-0.2, 0.2));
       card.setInteractive("deck");
       this.cards.push(card);
     }
@@ -61,7 +52,7 @@ export default class Deck extends Phaser.GameObjects.Sprite {
     this.lastDepth++;
     if (card) {
       card.setDepth(this.lastDepth);
-      card.flingTo({ x: randomFloat(790, 820), y: randomFloat(380, 400) });
+      card.flingTo({ x: getRandomFloat(790, 820), y: getRandomFloat(380, 400) });
       card.flipped = false;
     }
     return card;
@@ -69,7 +60,7 @@ export default class Deck extends Phaser.GameObjects.Sprite {
 
   /**
    *
-   * @param {2|3|4} numOfPlayers
+   * @param {number} numOfPlayers
    */
   async animateDrawCards(numOfPlayers) {
     const NUM_CARDS_EACH = 7;
