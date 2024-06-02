@@ -4,6 +4,7 @@ import { Game } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
 import { MainMenu } from "./scenes/MainMenu";
 import { Preloader } from "./scenes/Preloader";
+import { JoinGame } from "./scenes/JoinGame";
 import RoundRectanglePlugin from "phaser3-rex-plugins/plugins/roundrectangle-plugin.js";
 
 //  Find out more information about the Game Config at:
@@ -18,7 +19,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preloader, MainMenu, Game, GameOver],
+  scene: [Boot, Preloader, JoinGame, MainMenu, Game, GameOver],
   plugins: {
     global: [
       {
