@@ -1,34 +1,66 @@
-import { Scene } from 'phaser';
+import { Scene } from "phaser";
+import { CONFIG, SCREEN_CENTER } from "../config";
 
-export class MainMenu extends Scene
-{
-    
-    constructor ()
-    {
-        super('MainMenu');
-        this.cards = []
-    }
+export class MainMenu extends Scene {
+  constructor() {
+    super("MainMenu");
+    this.cards = [];
+  }
 
-    create ()
-    {
-        this.add.image(512, 384, 'background');
+  create() {
+    this.add
+      .image(CONFIG.SCREEN_WIDTH / 2, CONFIG.SCREEN_HEIGHT / 2, "background")
+      .setOrigin(0.5);
 
-        this.add.image(512, 300, 'logo');
+    this.add
+      .image(CONFIG.SCREEN_WIDTH / 2, CONFIG.SCREEN_HEIGHT / 2 - 100, "logo")
+      .setOrigin(0.5);
 
-        this.add.text(512, 460, 'Hello Menu', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+    this.add
+      .text(CONFIG.SCREEN_WIDTH / 2, CONFIG.SCREEN_HEIGHT / 2, "Create Game", {
+        fontFamily: "Arial Black",
+        fontSize: 38,
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 8,
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setInteractive()
+      .setName("CreateGame");
 
-        this.input.once('pointerdown', () => {
+    this.add
+      .text(
+        CONFIG.SCREEN_WIDTH / 2,
+        CONFIG.SCREEN_HEIGHT / 2 + 70,
+        "Join Game",
+        {
+          fontFamily: "Arial Black",
+          fontSize: 38,
+          color: "#ffffff",
+          stroke: "#000000",
+          strokeThickness: 8,
+          align: "center",
+        }
+      )
+      .setOrigin(0.5)
+      .setInteractive()
+      .setName("JoinGame");
 
-            this.scene.start('Game');
+    this.input.once("pointerdown", (pointer, targets) => {
+        /**
+         * @type {string[]}
+         */
+        const names = targets.map(e => e.name);
+        if(names.includes("CreateGame")) {
+            this.scene.start("Game")
+        }
 
-        });
-    }
+        if(names.includes("JoinGame")) {
+            this.scene.start("JoinGame")
+        }
+    });
+  }
 
-    update() {
-        
-    }
+  update() {}
 }

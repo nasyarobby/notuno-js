@@ -1,6 +1,10 @@
 // @ts-check
 
-export default class Player extends Phaser.GameObjects.Sprite {
+export default class OtherPlayer extends Phaser.GameObjects.Sprite {
+  /** @typedef {"not-active" | "player" | "other-player" | "online" | "com"} PlayerType */
+  /** @type {PlayerType} */
+  type;
+
   /** @type {boolean} */
   ready
 
@@ -16,11 +20,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
   /**
    *
    * @param {Phaser.Scene} scene
+   * @param {PlayerType} type
    * @param {number} pos
    */
-  constructor(scene, pos) {
+  constructor(scene, type, pos) {
     super(scene, 0, 0, "player");
 
+    this.type = type;
     this.ready = false;
     this.showReady = true;
 
@@ -28,7 +34,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     this.setPlayerPosition(pos)
 
-    this.box1 = scene.add.rexRoundRectangle(this.x, this.y, 300, 140, 10, 0xFFFFFF).setOrigin(0)
+    this.box1 = this.scene.add.rexRoundRectangle(this.x, this.y, 300, 140, 10, 0xFFFFFF).setOrigin(0)
     this.box2 = this.scene.add.rexRoundRectangle(this.x+5, this.y+5, 290, 130, 5, 0x004080).setOrigin(0)
     this.nameObj = this.scene.add.text(this.x+10, this.y+10, this.playerName, {
         fontSize: 32,
@@ -76,10 +82,14 @@ export default class Player extends Phaser.GameObjects.Sprite {
   /**
    *
    * @param {string} name
+   * @param {PlayerType | undefined} type
    * @returns {Player}
    */
-  setPlayerName(name) {
+  setPlayerName(name, type=undefined) {
     this.playerName = name;
+    if(type) {
+        this.setPlayerType(type);
+    }
     return this;
   }
 
@@ -100,6 +110,16 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.y = 20
     }
     return this;
+  }
+
+  /**
+   * 
+   * @param {PlayerType} type 
+   * @returns {Player}
+   */
+  setPlayerType(type) {
+    this.type = type;
+    return this
   }
 
   update() {

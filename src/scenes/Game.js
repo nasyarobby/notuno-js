@@ -134,5 +134,13 @@ export class Game extends Scene {
         };
       }
     }
+
+    if(targets.length && targets[0].name === "playerIsReadyInput") {
+      this.players[0].ready = true;
+    }
+
+    if(targets.length && targets[0].name === "playerIsNotReadyInput") {
+      this.players[0].ready = false;
+    }
   }
 }
